@@ -143,11 +143,11 @@
 
     // Build card data
     var cards = [];
-    if (levelId===1) cards=hiraganaLevel1.map(function(h){return{id:h.char,front:h.char,reading:h.romaji,meaning:'Hiragana "'+h.romaji+'"'};});
-    else if (levelId===2) cards=hiraganaLevel2.map(function(h){return{id:h.char,front:h.char,reading:h.romaji,meaning:h.type+' hiragana'};});
-    else if (levelId===3) cards=katakanaLevel3.map(function(k){return{id:k.char,front:k.char,reading:k.romaji,meaning:'Katakana "'+k.romaji+'"'};});
+    if (levelId===1) cards=hiraganaLevel1.map(function(h){return{id:h.char,front:h.char,reading:h.romaji,meaning:'Hiragana "'+h.romaji+'"',mnemonic:h.mnemonic||'',components:h.visualHint||''};});
+    else if (levelId===2) cards=hiraganaLevel2.map(function(h){return{id:h.char,front:h.char,reading:h.romaji,meaning:h.type+' hiragana',mnemonic:h.mnemonic||'',components:h.visualHint||''};});
+    else if (levelId===3) cards=katakanaLevel3.map(function(k){return{id:k.char,front:k.char,reading:k.romaji,meaning:'Katakana "'+k.romaji+'"',mnemonic:k.mnemonic||'',components:k.visualHint||''};});
     else if (levelId===4) {
-      cards=(katakanaLevel4.characters||[]).map(function(k){return{id:k.char,front:k.char,reading:k.romaji,meaning:'Katakana "'+k.romaji+'"'};});
+      cards=(katakanaLevel4.characters||[]).map(function(k){return{id:k.char,front:k.char,reading:k.romaji,meaning:'Katakana "'+k.romaji+'"',mnemonic:k.mnemonic||'',components:k.visualHint||''};});
       cards=cards.concat((katakanaLevel4.loanwords||[]).map(function(l){return{id:l.japanese,front:l.japanese,reading:l.reading,meaning:l.english};}));
     }
     else if (levelId>=5&&levelId<=7) {
