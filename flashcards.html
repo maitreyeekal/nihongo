@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards — Nihongo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/textures.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/flashcard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    .fc-container { max-width:800px; margin:0 auto; padding:16px; min-height:100vh; display:flex; flex-direction:column; }
+    .fc-nav { display:flex; align-items:center; padding:10px 0; margin-bottom:16px; }
+    .fc-nav button { background:none; border:none; font-size:1.3rem; cursor:pointer; padding:4px 8px; color:var(--color-text); }
+    .fc-nav h1 { font-family:'Shippori Mincho',serif; font-size:1.1rem; margin:0; flex:1; text-align:center; }
+    .fc-progress { margin-bottom:20px; }
+    .fc-progress-info { display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px; }
+    .fc-bar { height:6px; background:var(--color-border); border-radius:3px; overflow:hidden; }
+    .fc-bar-fill { height:100%; background:var(--color-accent); border-radius:3px; transition:width 0.3s; }
+
+    .fc-card-wrap { flex:1; display:flex; align-items:center; justify-content:center; perspective:1000px; cursor:pointer; }
+    .fc-card {
+      width:100%; max-width:380px; height:300px; position:relative;
+      transform-style:preserve-3d; transition:transform 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+    .fc-card.flipped { transform:rotateY(180deg); }
+    .fc-face {
+      position:absolute; inset:0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; backface-visibility:hidden;
+      background:var(--color-surface); border:1px solid var(--color-border);
+      border-radius:12px; padding:20px; overflow-y:auto;
+    }
+    .fc-back { transform:rotateY(180deg); }
+    .fc-char { font-family:'Shippori Mincho',serif; font-size:4.5rem; font-weight:700; line-height:1; }
+    .fc-char.small { font-size:2.5rem; }
+    .fc-hint { font-size:0.75rem; color:var(--color-text-secondary); margin-top:16px; opacity:0.5; }
+    .fc-reading { font-size:1.5rem; font-weight:700; color:var(--color-accent); margin-bottom:8px; }
+    .fc-meaning { font-size:1.1rem; color:var(--color-text); text-align:center; }
+    .fc-example { font-size:0.85rem; color:var(--color-text-secondary); margin-top:8px; padding:8px 12px; background:rgba(0,0,0,0.03); border-radius:6px; }
+    .fc-mnemonic {
+      font-size:0.8rem; line-height:1.4; color:var(--color-text);
+      margin-top:10px; padding:8px 12px; border-radius:6px;
+      border-left:3px solid var(--color-gold); background:rgba(184,134,11,0.06);
+      font-style:italic; text-align:left;
+    }
+    .fc-components {
+      font-size:0.75rem; color:var(--color-text-secondary); margin-top:6px;
+    }
+
+    .fc-speaker { text-align:center; margin:12px 0; }
+    .fc-speaker button { background:none; border:none; font-size:1.8rem; cursor:pointer; padding:6px; }
+
+    .fc-controls {
+      display:flex; gap:10px; padding:16px 0 24px; max-width:380px; margin:0 auto; width:100%;
+      opacity:0; pointer-events:none; transition:opacity 0.3s;
+    }
+    .fc-controls.show { opacity:1; pointer-events:auto; }
+    .fc-btn {
+      flex:1; padding:12px 8px; border:2px solid; border-radius:8px; cursor:pointer;
+      font-weight:700; font-size:0.95rem; background:none; font-family:inherit;
+      transition: background 0.2s;
+    }
+    .fc-btn-again { color:var(--color-accent-secondary); border-color:var(--color-accent-secondary); }
+    .fc-btn-again:hover { background:rgba(200,75,49,0.08); }
+    .fc-btn-good { color:var(--color-accent); border-color:var(--color-accent); }
+    .fc-btn-good:hover { background:rgba(61,90,128,0.08); }
+    .fc-btn-easy { color:var(--color-success); border-color:var(--color-success); }
+    .fc-btn-easy:hover { background:rgba(122,139,105,0.08); }
+
+    .fc-complete { text-align:center; padding:48px 16px; }
+    .fc-complete h2 { font-family:'Shippori Mincho',serif; color:var(--color-success); margin:16px 0 8px; }
+    .fc-stats { display:flex; gap:24px; justify-content:center; margin:20px 0; }
+    .fc-stat { text-align:center; }
+    .fc-stat-num { font-family:'Shippori Mincho',serif; font-size:1.8rem; font-weight:700; color:var(--color-accent); }
+    .fc-stat-label { font-size:0.75rem; color:var(--color-text-secondary); }
+    .fc-actions { display:flex; flex-direction:column; gap:10px; max-width:300px; margin:24px auto 0; }
+    .fc-actions a {
+      display:block; text-align:center; padding:12px; border-radius:8px;
+      text-decoration:none; font-weight:700;
+    }
+  </style>
+</head>
+<body class="paper-bg">
+  <div class="fc-container" id="app">
+    <p style="text-align:center;padding:60px;color:var(--color-text-secondary);">Loading flashcards...</p>
+  </div>
+
+  <script>
+    // Storage
+    var STORAGE_KEY = 'nihongo_progress';
+    var SETTINGS_KEY = 'nihongo_settings';
+    function getSettings() {
+      try { var r=localStorage.getItem(SETTINGS_KEY); return r?Object.assign({darkMode:false},JSON.parse(r)):{darkMode:false}; } catch(e){return{darkMode:false};}
+    }
+    if (getSettings().darkMode) document.documentElement.setAttribute('data-theme','dark');
+
+    // Audio
+    var jaVoice = null;
+    if ('speechSynthesis' in window) {
+      function findVoice(){var v=speechSynthesis.getVoices();jaVoice=v.find(function(x){return x.lang==='ja-JP'})||v.find(function(x){return x.lang.startsWith('ja')})||null;}
+      findVoice(); speechSynthesis.addEventListener('voiceschanged',findVoice);
+    }
+    function speak(t){if(!('speechSynthesis' in window)||!t)return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';u.rate=0.85;if(jaVoice)u.voice=jaVoice;speechSynthesis.speak(u);}
+
+    // SRS
+    function saveSRS(id,quality){
+      try{
+        var raw=localStorage.getItem(STORAGE_KEY);
+        var p=raw?JSON.parse(raw):{levels:{},srs:{},quizHistory:[]};
+        if(!p.srs)p.srs={};
+        var item=p.srs[id]||{interval:1,easeFactor:2.5,repetitions:0,nextReview:Date.now(),status:'new'};
+        if(quality==='again'){item.interval=1;item.easeFactor=Math.max(1.3,item.easeFactor-0.2);item.repetitions=0;item.status='learning';}
+        else if(quality==='good'){item.interval=Math.round(item.interval*item.easeFactor);item.repetitions++;item.status=item.repetitions>=3?'learned':'learning';}
+        else if(quality==='easy'){item.interval=Math.round(item.interval*item.easeFactor*1.3);item.easeFactor+=0.15;item.repetitions++;item.status=item.repetitions>=5?'mastered':item.repetitions>=3?'learned':'learning';}
+        item.nextReview=Date.now()+item.interval*86400000;
+        p.srs[id]=item;
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(p));
+      }catch(e){}
+    }
+  </script>
+
+  <script type="module">
+    import { hiraganaLevel1, hiraganaLevel2 } from './js/data/hiragana.js';
+    import { katakanaLevel3, katakanaLevel4 } from './js/data/katakana.js';
+    import { kanji } from './js/data/kanji.js';
+    import { grammar } from './js/data/grammar.js';
+    import { dialogues } from './js/data/dialogues.js';
+    import { kanjiOrigins } from './js/data/kanji-origins.js';
+
+    var params = new URLSearchParams(window.location.search);
+    var levelId = parseInt(params.get('level'));
+    if (!levelId) { window.location.href='index.html'; throw new Error('no level'); }
+
+    // Build card data
+    var cards = [];
+    if (levelId===1) cards=hiraganaLevel1.map(function(h){return{id:h.char,front:h.char,reading:h.romaji,meaning:'Hiragana "'+h.romaji+'"'};});
+    else if (levelId===2) cards=hiraganaLevel2.map(function(h){return{id:h.char,front:h.char,reading:h.romaji,meaning:h.type+' hiragana'};});
+    else if (levelId===3) cards=katakanaLevel3.map(function(k){return{id:k.char,front:k.char,reading:k.romaji,meaning:'Katakana "'+k.romaji+'"'};});
+    else if (levelId===4) {
+      cards=(katakanaLevel4.characters||[]).map(function(k){return{id:k.char,front:k.char,reading:k.romaji,meaning:'Katakana "'+k.romaji+'"'};});
+      cards=cards.concat((katakanaLevel4.loanwords||[]).map(function(l){return{id:l.japanese,front:l.japanese,reading:l.reading,meaning:l.english};}));
+    }
+    else if (levelId>=5&&levelId<=7) {
+      cards=kanji.filter(function(k){return k.level===levelId}).map(function(k){
+        var ex=k.examples&&k.examples[0]?(typeof k.examples[0]==='string'?k.examples[0]:k.examples[0].word+' ('+k.examples[0].meaning+')'):'';
+        return{id:k.kanji,front:k.kanji,reading:k.onyomi+' / '+k.kunyomi,meaning:k.meaning,example:ex,
+          mnemonic:k.mnemonic||'',components:k.components||''};
+      });
+      if (levelId===7) {
+        cards=cards.concat(grammar.map(function(g){
+          return{id:'g'+g.id,front:g.pattern,reading:g.formation||'',meaning:g.meaning,example:g.examples&&g.examples[0]?g.examples[0].japanese:''};
+        }));
+      }
+    }
+    else if (levelId===8) {
+      cards=dialogues.map(function(d){return{id:'d'+d.id,front:d.titleJp||d.title,reading:d.title,meaning:d.setting};});
+    }
+    else if (levelId===9) {
+      cards=kanjiOrigins.map(function(o){
+        return{id:'o'+o.kanji,front:o.kanji,reading:o.reading,meaning:o.meaning,
+          mnemonic:o.visualHint,components:o.ancientForm};
+      });
+    }
+
+    if (cards.length===0) {
+      document.getElementById('app').innerHTML='<div style="text-align:center;padding:60px;"><p>No cards for this level.</p><a href="index.html" style="color:var(--color-accent);">Back to Home</a></div>';
+      throw new Error('no cards');
+    }
+
+    // State
+    var currentIdx = 0;
+    var isFlipped = false;
+    var results = [];
+
+    function render() {
+      var app = document.getElementById('app');
+      app.innerHTML = '';
+
+      if (currentIdx >= cards.length) { renderComplete(); return; }
+      var card = cards[currentIdx];
+      var isSmall = card.front.length > 3;
+
+      app.innerHTML =
+        '<div class="fc-nav">' +
+          '<button onclick="history.back()">◁</button>' +
+          '<h1>Flashcards</h1>' +
+          '<div style="min-width:40px;"></div>' +
+        '</div>' +
+        '<div class="fc-progress">' +
+          '<div class="fc-progress-info"><span>Card ' + (currentIdx+1) + ' of ' + cards.length + '</span><span style="color:var(--color-accent);font-weight:700;">' + Math.round(((currentIdx+1)/cards.length)*100) + '%</span></div>' +
+          '<div class="fc-bar"><div class="fc-bar-fill" style="width:' + ((currentIdx+1)/cards.length*100) + '%"></div></div>' +
+        '</div>' +
+        '<div class="fc-card-wrap" id="card-wrap">' +
+          '<div class="fc-card" id="fc-card">' +
+            '<div class="fc-face">' +
+              '<div class="fc-char' + (isSmall?' small':'') + '">' + card.front + '</div>' +
+              '<div class="fc-hint">Tap to flip</div>' +
+            '</div>' +
+            '<div class="fc-face fc-back">' +
+              '<div class="fc-reading">' + (card.reading||'') + '</div>' +
+              '<div class="fc-meaning">' + (card.meaning||'') + '</div>' +
+              (card.mnemonic ? '<div class="fc-mnemonic">' + card.mnemonic + '</div>' : '') +
+              (card.components ? '<div class="fc-components">' + card.components + '</div>' : '') +
+              (card.example ? '<div class="fc-example">' + card.example + '</div>' : '') +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="fc-speaker"><button onclick="speak(\'' + card.front.replace(/'/g,"\\'") + '\')">🔊</button></div>' +
+        '<div class="fc-controls" id="fc-controls">' +
+          '<button class="fc-btn fc-btn-again" id="btn-again">Again<br><span style="font-size:0.7rem;font-weight:400;opacity:0.6;">[1]</span></button>' +
+          '<button class="fc-btn fc-btn-good" id="btn-good">Good<br><span style="font-size:0.7rem;font-weight:400;opacity:0.6;">[2]</span></button>' +
+          '<button class="fc-btn fc-btn-easy" id="btn-easy">Easy<br><span style="font-size:0.7rem;font-weight:400;opacity:0.6;">[3]</span></button>' +
+        '</div>';
+
+      isFlipped = false;
+
+      document.getElementById('card-wrap').addEventListener('click', function() {
+        isFlipped = !isFlipped;
+        document.getElementById('fc-card').classList.toggle('flipped', isFlipped);
+        document.getElementById('fc-controls').classList.toggle('show', isFlipped);
+      });
+
+      document.getElementById('btn-again').addEventListener('click', function(e){e.stopPropagation();mark('again');});
+      document.getElementById('btn-good').addEventListener('click', function(e){e.stopPropagation();mark('good');});
+      document.getElementById('btn-easy').addEventListener('click', function(e){e.stopPropagation();mark('easy');});
+
+      document.onkeydown = function(e) {
+        if (e.key===' '||e.key==='Enter') { e.preventDefault(); document.getElementById('card-wrap').click(); }
+        else if (e.key==='1'&&isFlipped) mark('again');
+        else if (e.key==='2'&&isFlipped) mark('good');
+        else if (e.key==='3'&&isFlipped) mark('easy');
+      };
+    }
+
+    function mark(quality) {
+      var card = cards[currentIdx];
+      results.push({id:card.id, quality:quality});
+      saveSRS(card.id, quality);
+      currentIdx++;
+      render();
+    }
+
+    function renderComplete() {
+      var app = document.getElementById('app');
+      var again=0,good=0,easy=0;
+      results.forEach(function(r){if(r.quality==='again')again++;else if(r.quality==='good')good++;else easy++;});
+      app.innerHTML =
+        '<div class="fc-complete">' +
+          '<div style="font-size:3rem;">✨</div>' +
+          '<h2>Deck Complete!</h2>' +
+          '<p style="color:var(--color-text-secondary);">You reviewed ' + cards.length + ' cards</p>' +
+          '<div class="fc-stats">' +
+            '<div class="fc-stat"><div class="fc-stat-num" style="color:var(--color-accent-secondary);">' + again + '</div><div class="fc-stat-label">Again</div></div>' +
+            '<div class="fc-stat"><div class="fc-stat-num">' + good + '</div><div class="fc-stat-label">Good</div></div>' +
+            '<div class="fc-stat"><div class="fc-stat-num" style="color:var(--color-success);">' + easy + '</div><div class="fc-stat-label">Easy</div></div>' +
+          '</div>' +
+          '<div class="fc-actions">' +
+            '<a href="level.html?id=' + levelId + '" style="background:var(--color-accent);color:#fff;">Back to Level</a>' +
+            '<a href="flashcards.html?level=' + levelId + '" style="border:2px solid var(--color-accent);color:var(--color-accent);">Study Again</a>' +
+            '<a href="index.html" style="color:var(--color-text-secondary);">Home</a>' +
+          '</div>' +
+        '</div>';
+      document.onkeydown = null;
+    }
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,384 @@
+/* ==========================================================================
+   Nihongo - Responsive Breakpoints
+   Mobile-first responsive design
+   ========================================================================== */
+
+/* ==========================================================================
+   Mobile (< 640px) - Base / default styles
+   ========================================================================== */
+
+/* Grids collapse to fewer columns on mobile */
+.grid-3,
+.grid-4,
+.grid-5 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Quiz options stack on very small screens */
+@media (max-width: 400px) {
+  .quiz-options {
+    grid-template-columns: 1fr;
+  }
+
+  .quiz-option {
+    min-height: 56px;
+    padding: var(--space-md);
+  }
+
+  .flashcard-controls {
+    flex-direction: column;
+  }
+
+  .flashcard-btn {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .chat-choices {
+    max-width: 100%;
+  }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 640px) {
+  /* Typography scaling */
+  h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  h3 {
+    font-size: var(--font-size-lg);
+  }
+
+  /* Layout */
+  .page-container {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+  }
+
+  /* Cards full width */
+  .card {
+    padding: var(--space-md);
+  }
+
+  /* Nav */
+  .nav-title {
+    font-size: var(--font-size-base);
+  }
+
+  /* Flashcard sizing */
+  .flashcard-container {
+    max-width: 320px;
+  }
+
+  .flashcard-character {
+    font-size: 3.5rem;
+  }
+
+  .flashcard-character-md {
+    font-size: 2.5rem;
+  }
+
+  /* Quiz */
+  .quiz-question-text {
+    font-size: var(--font-size-3xl);
+  }
+
+  .quiz-options {
+    gap: var(--space-sm);
+  }
+
+  .quiz-option {
+    font-size: var(--font-size-base);
+    padding: var(--space-md);
+  }
+
+  .quiz-results-stats {
+    gap: var(--space-lg);
+  }
+
+  .quiz-results-score {
+    font-size: var(--font-size-3xl);
+  }
+
+  /* Matching grid */
+  .matching-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-xs);
+  }
+
+  .matching-item {
+    padding: var(--space-sm);
+    font-size: var(--font-size-base);
+    min-height: 48px;
+  }
+
+  /* Conversation */
+  .chat-bubble {
+    max-width: 88%;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .chat-choices {
+    max-width: 95%;
+  }
+
+  .chat-choice {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+  }
+
+  .chat-score-breakdown {
+    gap: var(--space-lg);
+  }
+
+  .chat-score-value {
+    font-size: var(--font-size-3xl);
+  }
+
+  /* Bottom nav label */
+  .bottom-nav-label {
+    font-size: 10px;
+  }
+
+  /* Grid adjustments */
+  .grid-2 {
+    gap: var(--space-sm);
+  }
+
+  .grid-3,
+  .grid-4,
+  .grid-5 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+
+  /* Section spacing */
+  .section {
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Mistake items */
+  .mistake-item {
+    padding: var(--space-sm);
+    gap: var(--space-sm);
+  }
+
+  .mistake-character {
+    font-size: var(--font-size-xl);
+    min-width: 40px;
+  }
+}
+
+/* ==========================================================================
+   Tablet (640px - 1024px)
+   ========================================================================== */
+@media (min-width: 640px) {
+  /* Grid system */
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Flashcard */
+  .flashcard-container {
+    max-width: 360px;
+  }
+
+  .flashcard-character {
+    font-size: 4rem;
+  }
+
+  /* Quiz */
+  .quiz-question-text {
+    font-size: var(--font-size-4xl);
+  }
+
+  /* Conversation */
+  .chat-bubble {
+    max-width: 75%;
+  }
+
+  .chat-choices {
+    max-width: 80%;
+  }
+}
+
+/* ==========================================================================
+   Desktop (> 1024px)
+   ========================================================================== */
+@media (min-width: 1024px) {
+  /* Page centering */
+  .page-container {
+    max-width: var(--max-width);
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
+  }
+
+  /* Grid system */
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .grid-5 {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  /* Nav centered within max-width */
+  .nav {
+    max-width: 100%;
+  }
+
+  .nav-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  /* Flashcard */
+  .flashcard-container {
+    max-width: 400px;
+  }
+
+  .flashcard-character {
+    font-size: 5rem;
+  }
+
+  /* Quiz */
+  .quiz-question-text {
+    font-size: var(--font-size-4xl);
+  }
+
+  .quiz-options {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Conversation */
+  .chat-container {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .chat-bubble {
+    max-width: 70%;
+  }
+
+  .chat-choices {
+    max-width: 70%;
+  }
+
+  /* Cards hover effect on desktop */
+  .card-interactive:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Matching grid */
+  .matching-grid {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+/* ==========================================================================
+   Large Desktop (> 1280px)
+   ========================================================================== */
+@media (min-width: 1280px) {
+  .page-container {
+    max-width: var(--max-width);
+  }
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  .flashcard {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   High Contrast
+   ========================================================================== */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #999999;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+
+  .card,
+  .quiz-option,
+  .matching-item,
+  .chat-bubble.npc,
+  .chat-choice {
+    border-width: 2px;
+  }
+}
+
+/* ==========================================================================
+   Print
+   ========================================================================== */
+@media print {
+  .nav,
+  .bottom-nav,
+  .flashcard-controls,
+  .chat-choices,
+  .toast-container {
+    display: none;
+  }
+
+  .page-container {
+    padding-top: 0;
+    padding-bottom: 0;
+    max-width: 100%;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #cccccc;
+  }
+}

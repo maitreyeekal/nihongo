@@ -1,0 +1,89 @@
+/* ==========================================================================
+   Nihongo - CSS Custom Properties
+   Japanese-inspired design tokens
+   ========================================================================== */
+
+:root {
+  /* --- Colors (Light Mode) --- */
+  --color-bg: #F5F0E8;           /* Washi paper */
+  --color-surface: #FAF7F2;      /* Elevated surface */
+  --color-text: #2C2C2C;         /* Primary text */
+  --color-text-secondary: #6B6560; /* Secondary text */
+  --color-accent: #3D5A80;       /* Ai Indigo */
+  --color-accent-secondary: #C84B31; /* Shu Vermillion */
+  --color-success: #7A8B69;      /* Matcha green */
+  --color-gold: #B8860B;         /* Kinshu gold */
+  --color-border: #D4CFC7;       /* Subtle border */
+
+  /* --- Dark Mode Overrides --- */
+  /* Applied via [data-theme="dark"] on <html> or <body> */
+
+  /* --- Typography --- */
+  --font-heading: 'Shippori Mincho', serif;
+  --font-body: 'Noto Sans JP', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 2rem;      /* 32px */
+  --font-size-4xl: 3rem;      /* 48px */
+  --font-size-5xl: 5rem;      /* 80px */
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.8;
+
+  /* --- Spacing --- */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+
+  /* --- Layout --- */
+  --border-radius: 8px;
+  --max-width: 800px;
+
+  /* --- Transitions --- */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+
+  /* --- Shadows --- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  /* --- Z-index scale --- */
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-overlay: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+}
+
+/* --- Dark Mode --- */
+[data-theme="dark"] {
+  --color-bg: #1A1A2E;
+  --color-surface: #242438;
+  --color-text: #E8E4DC;
+  --color-text-secondary: #A09B93;
+  --color-accent: #6B8EAE;
+  --color-accent-secondary: #E07A5F;
+  --color-success: #8B9E7A;
+  --color-gold: #D4A017;
+  --color-border: #3A3A50;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+}

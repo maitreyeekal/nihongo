@@ -1,0 +1,319 @@
+/* ==========================================================================
+   Nihongo - Conversation / Chat Bubbles
+   Level 8 dialogue practice UI
+   ========================================================================== */
+
+/* --- Chat Container ---
+   ========================================================================== */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  max-width: 100%;
+}
+
+/* --- Chat Bubble ---
+   ========================================================================== */
+.chat-bubble {
+  max-width: 80%;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  word-wrap: break-word;
+  position: relative;
+  animation: bubble-in 0.3s ease;
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- NPC Bubble (left-aligned) ---
+   ========================================================================== */
+.chat-bubble.npc {
+  align-self: flex-start;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 2px;
+}
+
+/* --- Player Bubble (right-aligned) ---
+   ========================================================================== */
+.chat-bubble.player {
+  align-self: flex-end;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  border-bottom-right-radius: 2px;
+}
+
+[data-theme="dark"] .chat-bubble.player {
+  background-color: var(--color-accent);
+}
+
+/* --- Speaker Label ---
+   ========================================================================== */
+.chat-speaker {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-xs);
+  opacity: 0.7;
+}
+
+.chat-bubble.npc .chat-speaker {
+  color: var(--color-accent);
+}
+
+.chat-bubble.player .chat-speaker {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* --- Japanese text with reading ---
+   ========================================================================== */
+.chat-japanese {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-xs);
+}
+
+.chat-romaji {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  opacity: 0.6;
+}
+
+.chat-translation {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+  margin-top: var(--space-xs);
+  font-style: italic;
+}
+
+/* --- Typing Indicator ---
+   ========================================================================== */
+.chat-typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-md) var(--space-lg);
+  align-self: flex-start;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  border-bottom-left-radius: 2px;
+}
+
+.chat-typing-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-text-secondary);
+  border-radius: 50%;
+  animation: typing-bounce 1.4s ease-in-out infinite;
+}
+
+.chat-typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.chat-typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* --- Response Choices ---
+   ========================================================================== */
+.chat-choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+  align-self: flex-end;
+  width: 100%;
+  max-width: 85%;
+  animation: bubble-in 0.3s ease;
+}
+
+.chat-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--border-radius);
+  color: var(--color-accent);
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+  text-align: left;
+}
+
+.chat-choice:hover {
+  background-color: var(--color-accent);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.chat-choice:active {
+  transform: translateX(2px);
+}
+
+.chat-choice.selected {
+  background-color: var(--color-accent);
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.chat-choice.correct {
+  border-color: var(--color-success);
+  background-color: rgba(122, 139, 105, 0.1);
+  color: var(--color-success);
+  pointer-events: none;
+}
+
+.chat-choice.incorrect {
+  border-color: var(--color-accent-secondary);
+  background-color: rgba(200, 75, 49, 0.08);
+  color: var(--color-accent-secondary);
+  pointer-events: none;
+}
+
+.chat-choice-number {
+  font-weight: var(--font-weight-bold);
+  min-width: 24px;
+  text-align: center;
+  opacity: 0.6;
+}
+
+.chat-choice-text {
+  flex: 1;
+}
+
+.chat-choice-japanese {
+  font-family: var(--font-heading);
+  display: block;
+}
+
+.chat-choice-english {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+  display: block;
+  margin-top: 2px;
+}
+
+/* --- Scenario Score Display ---
+   ========================================================================== */
+.chat-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xl) var(--space-lg);
+  margin-top: var(--space-lg);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+.chat-score-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.chat-score-value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gold);
+}
+
+.chat-score-breakdown {
+  display: flex;
+  gap: var(--space-xl);
+  margin-top: var(--space-sm);
+}
+
+.chat-score-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.chat-score-stat-value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.chat-score-stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.chat-score-message {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-sm);
+}
+
+.chat-score-actions {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+/* --- Scenario Header ---
+   ========================================================================== */
+.chat-scenario-header {
+  text-align: center;
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+  background-color: rgba(61, 90, 128, 0.05);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(61, 90, 128, 0.1);
+}
+
+[data-theme="dark"] .chat-scenario-header {
+  background-color: rgba(107, 142, 174, 0.08);
+  border-color: rgba(107, 142, 174, 0.15);
+}
+
+.chat-scenario-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-xs);
+}
+
+.chat-scenario-desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}

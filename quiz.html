@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz — Nihongo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/textures.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/quiz.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    .quiz-container { max-width:800px; margin:0 auto; padding:16px; min-height:100vh; }
+    .quiz-nav { display:flex; align-items:center; padding:10px 0; margin-bottom:16px; }
+    .quiz-nav button { background:none; border:none; font-size:1.3rem; cursor:pointer; padding:4px 8px; color:var(--color-text); }
+    .quiz-nav h1 { font-family:'Shippori Mincho',serif; font-size:1.1rem; margin:0; flex:1; text-align:center; }
+    .q-progress { margin-bottom:32px; }
+    .q-progress-info { display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px; }
+    .q-bar { height:6px; background:var(--color-border); border-radius:3px; overflow:hidden; }
+    .q-bar-fill { height:100%; background:var(--color-accent); border-radius:3px; transition:width 0.3s; }
+    .q-display { text-align:center; padding:32px 0; margin-bottom:24px; }
+    .q-prompt { font-size:0.85rem; color:var(--color-text-secondary); margin-bottom:12px; }
+    .q-char { font-family:'Shippori Mincho',serif; font-size:4rem; font-weight:700; line-height:1.1; margin-bottom:12px; }
+    .q-char.small { font-size:2rem; }
+    .q-speaker { background:none; border:none; font-size:1.5rem; cursor:pointer; padding:4px 8px; }
+    .q-options { display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:500px; margin:0 auto; }
+    .q-opt {
+      padding:14px 16px; font-size:1rem; font-weight:500; background:var(--color-surface);
+      color:var(--color-text); border:2px solid var(--color-border); border-radius:8px;
+      cursor:pointer; transition:all 0.15s; min-height:54px; word-break:break-word;
+      text-align:center; font-family:inherit;
+    }
+    .q-opt:hover:not(:disabled) { border-color:var(--color-accent); transform:translateY(-1px); }
+    .q-opt.correct { border-color:var(--color-success); background:rgba(122,139,105,0.12); color:var(--color-success); font-weight:700; }
+    .q-opt.wrong { border-color:var(--color-accent-secondary); background:rgba(200,75,49,0.1); color:var(--color-accent-secondary); }
+    .q-opt:disabled { cursor:default; transform:none; }
+
+    .result-container { text-align:center; padding:32px 0; }
+    .result-circle {
+      width:130px; height:130px; border-radius:50%; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; margin:0 auto 20px; border-width:5px; border-style:solid;
+    }
+    .result-score { font-family:'Shippori Mincho',serif; font-size:2.5rem; font-weight:700; line-height:1; }
+    .result-count { font-size:0.8rem; color:var(--color-text-secondary); margin-top:2px; }
+    .result-msg { font-family:'Shippori Mincho',serif; font-size:1.4rem; font-weight:700; margin-bottom:12px; }
+    .unlock-card { display:inline-block; padding:14px 32px; border:2px solid var(--color-gold); background:rgba(184,134,11,0.06); border-radius:10px; margin-bottom:20px; }
+    .mistake-card {
+      display:flex; align-items:center; gap:14px; padding:10px 16px; margin-bottom:6px;
+      background:var(--color-surface); border:1px solid var(--color-border); border-radius:8px;
+      border-left:3px solid var(--color-accent-secondary); text-align:left;
+    }
+    .mistake-char { font-family:'Shippori Mincho',serif; font-size:1.4rem; font-weight:700; min-width:44px; text-align:center; }
+    .actions { display:flex; flex-direction:column; gap:10px; max-width:360px; margin:24px auto 0; }
+    .actions a, .actions button {
+      display:block; width:100%; text-align:center; padding:12px; border-radius:8px;
+      text-decoration:none; font-weight:700; font-family:inherit; font-size:1rem; cursor:pointer;
+    }
+  </style>
+</head>
+<body class="paper-bg">
+  <div class="quiz-container" id="app">
+    <p style="text-align:center;padding:60px;color:var(--color-text-secondary);">Loading quiz...</p>
+  </div>
+
+  <script>
+    var STORAGE_KEY = 'nihongo_progress';
+    var SETTINGS_KEY = 'nihongo_settings';
+    function getSettings(){try{var r=localStorage.getItem(SETTINGS_KEY);return r?Object.assign({darkMode:false},JSON.parse(r)):{darkMode:false};}catch(e){return{darkMode:false};}}
+    function getProgress(){try{var r=localStorage.getItem(STORAGE_KEY);if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
+    function saveProgress(p){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(p));}catch(e){}}
+    if(getSettings().darkMode)document.documentElement.setAttribute('data-theme','dark');
+
+    // Audio
+    var jaVoice=null;
+    if('speechSynthesis' in window){function fv(){var v=speechSynthesis.getVoices();jaVoice=v.find(function(x){return x.lang==='ja-JP'})||v.find(function(x){return x.lang.startsWith('ja')})||null;}fv();speechSynthesis.addEventListener('voiceschanged',fv);}
+    function speak(t){if(!('speechSynthesis' in window)||!t)return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';u.rate=0.85;if(jaVoice)u.voice=jaVoice;speechSynthesis.speak(u);}
+
+    function completeQuiz(levelId,score,total){
+      var p=getProgress();
+      if(!p){var l={};for(var i=1;i<=9;i++)l[i]={unlocked:true,bestScore:0,attempts:0,completed:false};p={levels:l,srs:{},quizHistory:[]};}
+      if(!p.levels)p.levels={};
+      if(!p.levels[levelId])p.levels[levelId]={unlocked:true,bestScore:0,attempts:0,completed:false};
+      var lv=p.levels[levelId];
+      var pct=Math.round((score/total)*100);
+      lv.attempts=(lv.attempts||0)+1;
+      if(pct>lv.bestScore)lv.bestScore=pct;
+      if(pct>=70&&!lv.completed){
+        lv.completed=true;
+        var next=levelId+1;
+        if(next<=9){if(!p.levels[next])p.levels[next]={unlocked:false,bestScore:0,attempts:0,completed:false};p.levels[next].unlocked=true;}
+      }
+      if(!p.quizHistory)p.quizHistory=[];
+      p.quizHistory.push({levelId:levelId,score:score,total:total,pct:pct,ts:Date.now()});
+      saveProgress(p);
+      return {pct:pct,passed:pct>=70};
+    }
+  </script>
+
+  <script type="module">
+    import { hiraganaLevel1, hiraganaLevel2 } from './js/data/hiragana.js';
+    import { katakanaLevel3, katakanaLevel4 } from './js/data/katakana.js';
+    import { kanji } from './js/data/kanji.js';
+    import { vocabulary } from './js/data/vocabulary.js';
+    import { grammar } from './js/data/grammar.js';
+    import { kanjiOrigins } from './js/data/kanji-origins.js';
+
+    var params = new URLSearchParams(window.location.search);
+    var levelId = parseInt(params.get('level'));
+    if (!levelId) { window.location.href='index.html'; throw new Error('no level'); }
+
+    // Shuffle
+    function shuffle(arr){var a=[...arr];for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+    // Get pool
+    var pool = [];
+    var qType = 'kana'; // kana, kanji, vocab
+    if (levelId===1) pool=hiraganaLevel1;
+    else if (levelId===2) pool=hiraganaLevel2;
+    else if (levelId===3) pool=katakanaLevel3;
+    else if (levelId===4) pool=katakanaLevel4.characters||[];
+    else if (levelId>=5&&levelId<=6) { pool=kanji.filter(function(k){return k.level===levelId}); qType='kanji'; }
+    else if (levelId===7) { pool=vocabulary.filter(function(v){return v.level===7}); qType='vocab'; }
+    else if (levelId===9) { pool=kanjiOrigins.map(function(o){return{kanji:o.kanji,meaning:o.meaning}}); qType='kanji'; }
+    else { pool=vocabulary.filter(function(v){return v.level===7}); qType='vocab'; }
+
+    var questionCount = levelId<=4?15:12;
+
+    // Generate questions
+    function genQuestions() {
+      var items = shuffle(pool);
+      var qs = [];
+      for (var i=0; i<Math.min(questionCount, items.length*2); i++) {
+        var item = items[i % items.length];
+        var q = null;
+
+        if (qType==='kana') {
+          var isCharQ = i%2===0;
+          if (isCharQ) {
+            var correct = item.romaji;
+            var distractors = shuffle(pool.filter(function(p){return p.char!==item.char})).slice(0,3).map(function(p){return p.romaji});
+            q = { display:item.char, prompt:'What is the reading?', correct:correct, options:shuffle([correct].concat(distractors)) };
+          } else {
+            var correct = item.char;
+            var distractors = shuffle(pool.filter(function(p){return p.char!==item.char})).slice(0,3).map(function(p){return p.char});
+            q = { display:item.romaji, prompt:'Which character?', correct:correct, options:shuffle([correct].concat(distractors)) };
+          }
+        } else if (qType==='kanji') {
+          var correct = item.meaning;
+          var distractors = shuffle(pool.filter(function(p){return p.kanji!==item.kanji})).slice(0,3).map(function(p){return p.meaning});
+          q = { display:item.kanji, prompt:'What does this kanji mean?', correct:correct, options:shuffle([correct].concat(distractors)) };
+        } else {
+          var correct = item.english;
+          var distractors = shuffle(pool.filter(function(p){return p.japanese!==item.japanese})).slice(0,3).map(function(p){return p.english});
+          q = { display:item.japanese, prompt:'What does this mean?', correct:correct, options:shuffle([correct].concat(distractors)) };
+        }
+
+        if (q && q.options.length>=4) qs.push(q);
+      }
+      return qs;
+    }
+
+    var questions = genQuestions();
+    var currentQ = 0;
+    var answers = [];
+
+    function renderQuestion() {
+      var app = document.getElementById('app');
+      if (currentQ >= questions.length) { renderResults(); return; }
+      var q = questions[currentQ];
+      var isSmall = q.display.length > 3;
+
+      app.innerHTML =
+        '<div class="quiz-nav"><button onclick="history.back()">◁</button><h1>Quiz</h1><div style="min-width:40px;"></div></div>' +
+        '<div class="q-progress">' +
+          '<div class="q-progress-info"><span>Question ' + (currentQ+1) + ' of ' + questions.length + '</span><span style="color:var(--color-accent);font-weight:700;">' + Math.round(currentQ/questions.length*100) + '%</span></div>' +
+          '<div class="q-bar"><div class="q-bar-fill" style="width:' + (currentQ/questions.length*100) + '%"></div></div>' +
+        '</div>' +
+        '<div class="q-display">' +
+          '<div class="q-prompt">' + q.prompt + '</div>' +
+          '<div class="q-char' + (isSmall?' small':'') + '">' + q.display + '</div>' +
+          '<button class="q-speaker" onclick="speak(\'' + q.display.replace(/'/g,"\\'") + '\')">🔊</button>' +
+        '</div>' +
+        '<div class="q-options" id="q-options"></div>';
+
+      var optGrid = document.getElementById('q-options');
+      q.options.forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'q-opt';
+        btn.textContent = opt;
+        btn.addEventListener('click', function() { selectAnswer(opt, q, optGrid); });
+        optGrid.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(selected, q, optGrid) {
+      var isCorrect = selected === q.correct;
+      answers.push({ display:q.display, selected:selected, correct:q.correct, isCorrect:isCorrect });
+
+      var btns = optGrid.querySelectorAll('.q-opt');
+      btns.forEach(function(btn) {
+        btn.disabled = true;
+        if (btn.textContent === q.correct) btn.classList.add('correct');
+        if (btn.textContent === selected && !isCorrect) btn.classList.add('wrong');
+      });
+
+      setTimeout(function() { currentQ++; renderQuestion(); }, 900);
+    }
+
+    function renderResults() {
+      var app = document.getElementById('app');
+      var score = answers.filter(function(a){return a.isCorrect}).length;
+      var total = answers.length;
+      var pct = Math.round(score/total*100);
+      var passed = pct >= 70;
+
+      var result = completeQuiz(levelId, score, total);
+
+      var mistakes = answers.filter(function(a){return !a.isCorrect});
+
+      var html = '<div class="result-container">' +
+        '<div class="result-circle" style="border-color:' + (passed?'var(--color-success)':'var(--color-accent-secondary)') + ';background:' + (passed?'rgba(122,139,105,0.08)':'rgba(200,75,49,0.06)') + ';">' +
+          '<div class="result-score" style="color:' + (passed?'var(--color-success)':'var(--color-accent-secondary)') + ';">' + pct + '%</div>' +
+          '<div class="result-count">' + score + '/' + total + '</div>' +
+        '</div>' +
+        '<div class="result-msg" style="color:' + (passed?'var(--color-success)':'var(--color-accent-secondary)') + ';">' + (passed?'Congratulations!':'Keep Practicing!') + '</div>';
+
+      if (passed && levelId < 9) {
+        html += '<div class="unlock-card"><div style="font-size:1.5rem;margin-bottom:4px;">🎉</div><div style="font-family:Shippori Mincho,serif;font-weight:700;color:var(--color-gold);">Level ' + (levelId+1) + ' Unlocked!</div></div>';
+      }
+      html += '</div>';
+
+      if (mistakes.length > 0) {
+        html += '<div style="margin-bottom:24px;"><h3 style="font-family:Shippori Mincho,serif;font-size:1rem;margin-bottom:10px;">Mistakes (' + mistakes.length + ')</h3>';
+        mistakes.forEach(function(m) {
+          html += '<div class="mistake-card"><div class="mistake-char">' + m.display + '</div><div style="flex:1;"><div style="font-size:0.78rem;color:var(--color-accent-secondary);">Your answer: ' + m.selected + '</div><div style="font-size:0.78rem;color:var(--color-success);font-weight:500;">Correct: ' + m.correct + '</div></div></div>';
+        });
+        html += '</div>';
+      }
+
+      html += '<div class="actions">' +
+        '<a href="level.html?id=' + levelId + '" style="background:var(--color-accent);color:#fff;">Back to Level</a>' +
+        '<a href="quiz.html?level=' + levelId + '" style="border:2px solid var(--color-accent);color:var(--color-accent);">Try Again</a>' +
+        '<a href="index.html" style="color:var(--color-text-secondary);">Home</a>' +
+      '</div>';
+
+      app.innerHTML = html;
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>

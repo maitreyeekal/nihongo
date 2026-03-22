@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — Nihongo</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/textures.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    .settings-section {
+      margin-bottom: var(--space-xl);
+    }
+
+    .settings-section-title {
+      font-family: var(--font-heading, 'Shippori Mincho', serif);
+      font-size: var(--font-size-lg, 1.125rem);
+      font-weight: var(--font-weight-bold, 700);
+      color: var(--color-text);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .settings-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .settings-item:last-child {
+      border-bottom: none;
+    }
+
+    .settings-item-label {
+      font-size: var(--font-size-base, 1rem);
+      color: var(--color-text);
+    }
+
+    /* Toggle Switch */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: var(--color-border, #ccc);
+      border-radius: 26px;
+      transition: background-color 0.25s ease;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      transition: transform 0.25s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background-color: var(--color-accent, #3D5A80);
+    }
+
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(22px);
+    }
+
+    .toggle input:focus-visible + .toggle-slider {
+      outline: 2px solid var(--color-accent, #3D5A80);
+      outline-offset: 2px;
+    }
+
+    .settings-danger-zone {
+      margin-top: var(--space-xl);
+      padding: var(--space-lg);
+      border: 1px solid var(--color-accent-secondary, #C85A3A);
+      border-radius: var(--border-radius, 8px);
+      background-color: rgba(200, 90, 58, 0.05);
+    }
+
+    [data-theme="dark"] .settings-danger-zone {
+      background-color: rgba(200, 90, 58, 0.1);
+    }
+
+    .settings-about {
+      margin-top: var(--space-xl);
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm, 0.875rem);
+    }
+  </style>
+</head>
+<body class="paper-bg">
+
+  <div class="page-container" id="app"></div>
+
+  <script type="module">
+    import { renderNav, renderBottomNav } from './js/ui/nav.js';
+    import { getSettings, saveSettings, resetProgress } from './js/engine/storage.js';
+
+    const app = document.getElementById('app');
+    const settings = getSettings();
+
+    // Apply dark mode on load if set
+    if (settings.darkMode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    function toggleDarkMode(enabled) {
+      if (enabled) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    }
+
+    function createToggle(id, checked, onChange) {
+      const label = document.createElement('label');
+      label.className = 'toggle';
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.id = id;
+      input.checked = checked;
+      input.addEventListener('change', () => onChange(input.checked));
+
+      const slider = document.createElement('span');
+      slider.className = 'toggle-slider';
+
+      label.appendChild(input);
+      label.appendChild(slider);
+      return label;
+    }
+
+    function createSettingsItem(labelText, toggleId, checked, onChange) {
+      const item = document.createElement('div');
+      item.className = 'settings-item';
+
+      const label = document.createElement('span');
+      label.className = 'settings-item-label';
+      label.textContent = labelText;
+
+      item.appendChild(label);
+      item.appendChild(createToggle(toggleId, checked, onChange));
+      return item;
+    }
+
+    function saveSetting(key, value) {
+      const current = getSettings();
+      current[key] = value;
+      saveSettings(current);
+    }
+
+    // Render top nav
+    renderNav('Settings', true, false);
+
+    // Preferences section
+    const prefsSection = document.createElement('div');
+    prefsSection.className = 'settings-section';
+
+    const prefsTitle = document.createElement('h2');
+    prefsTitle.className = 'settings-section-title';
+    prefsTitle.textContent = 'Preferences';
+    prefsSection.appendChild(prefsTitle);
+
+    prefsSection.appendChild(createSettingsItem('Dark Mode', 'darkMode', settings.darkMode, (val) => {
+      saveSetting('darkMode', val);
+      toggleDarkMode(val);
+    }));
+
+    prefsSection.appendChild(createSettingsItem('Show Romaji', 'showRomaji', settings.showRomaji, (val) => {
+      saveSetting('showRomaji', val);
+    }));
+
+    prefsSection.appendChild(createSettingsItem('Auto-play Audio', 'autoPlayAudio', settings.autoPlayAudio, (val) => {
+      saveSetting('autoPlayAudio', val);
+    }));
+
+    prefsSection.appendChild(createSettingsItem('Show Furigana', 'showFurigana', settings.furigana, (val) => {
+      saveSetting('furigana', val);
+    }));
+
+    app.appendChild(prefsSection);
+
+    // Danger zone
+    const dangerZone = document.createElement('div');
+    dangerZone.className = 'settings-danger-zone';
+
+    const dangerTitle = document.createElement('h2');
+    dangerTitle.className = 'settings-section-title';
+    dangerTitle.textContent = 'Danger Zone';
+    dangerTitle.style.borderColor = 'var(--color-accent-secondary, #C85A3A)';
+    dangerZone.appendChild(dangerTitle);
+
+    const dangerText = document.createElement('p');
+    dangerText.style.marginBottom = 'var(--space-md)';
+    dangerText.style.color = 'var(--color-text-secondary)';
+    dangerText.style.fontSize = 'var(--font-size-sm, 0.875rem)';
+    dangerText.textContent = 'This will erase all your learning progress. This action cannot be undone.';
+    dangerZone.appendChild(dangerText);
+
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'btn btn-danger btn-block';
+    resetBtn.textContent = 'Reset All Progress';
+    resetBtn.addEventListener('click', () => {
+      const confirmed = confirm('Are you sure you want to reset all progress? This cannot be undone.');
+      if (confirmed) {
+        resetProgress();
+        alert('All progress has been reset.');
+        window.location.reload();
+      }
+    });
+    dangerZone.appendChild(resetBtn);
+
+    app.appendChild(dangerZone);
+
+    // About section
+    const aboutSection = document.createElement('div');
+    aboutSection.className = 'settings-about';
+    aboutSection.textContent = 'Nihongo v1.0 — Learn Japanese from scratch';
+    app.appendChild(aboutSection);
+
+    // Bottom nav
+    renderBottomNav('settings');
+  </script>
+</body>
+</html>

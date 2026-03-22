@@ -1,0 +1,232 @@
+/* ==========================================================================
+   Nihongo - CSS-Only Textures
+   Japanese washi paper and ink-inspired visual effects
+   ========================================================================== */
+
+/* --- Paper Fiber Grain ---
+   Layered repeating gradients that simulate washi paper texture
+   ========================================================================== */
+.paper-bg {
+  background-color: var(--color-bg);
+  background-image:
+    /* Fine horizontal fibers */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(139, 125, 107, 0.03) 2px,
+      rgba(139, 125, 107, 0.03) 3px
+    ),
+    /* Fine vertical fibers */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(139, 125, 107, 0.02) 3px,
+      rgba(139, 125, 107, 0.02) 4px
+    ),
+    /* Diagonal texture layer */
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 5px,
+      rgba(160, 145, 125, 0.015) 5px,
+      rgba(160, 145, 125, 0.015) 6px
+    ),
+    /* Counter-diagonal texture */
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 7px,
+      rgba(160, 145, 125, 0.01) 7px,
+      rgba(160, 145, 125, 0.01) 8px
+    );
+}
+
+[data-theme="dark"] .paper-bg {
+  background-color: var(--color-bg);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(200, 195, 185, 0.02) 2px,
+      rgba(200, 195, 185, 0.02) 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(200, 195, 185, 0.015) 3px,
+      rgba(200, 195, 185, 0.015) 4px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 5px,
+      rgba(200, 195, 185, 0.01) 5px,
+      rgba(200, 195, 185, 0.01) 6px
+    );
+}
+
+/* --- Ink Wash ---
+   Radial gradient mimicking sumi ink wash (sumi-e) effect
+   ========================================================================== */
+.ink-wash {
+  background-image:
+    radial-gradient(
+      ellipse at 20% 50%,
+      rgba(44, 44, 44, 0.03) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 20%,
+      rgba(44, 44, 44, 0.02) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 50% 80%,
+      rgba(61, 90, 128, 0.02) 0%,
+      transparent 45%
+    );
+}
+
+[data-theme="dark"] .ink-wash {
+  background-image:
+    radial-gradient(
+      ellipse at 20% 50%,
+      rgba(107, 142, 174, 0.04) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 20%,
+      rgba(107, 142, 174, 0.03) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 50% 80%,
+      rgba(224, 122, 95, 0.02) 0%,
+      transparent 45%
+    );
+}
+
+/* --- Brush Border (Bottom) ---
+   Tapered gradient simulating a brushstroke along the bottom edge
+   ========================================================================== */
+.brush-border {
+  border-bottom: 2px solid transparent;
+  border-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-border) 8%,
+      var(--color-border) 15%,
+      rgba(212, 207, 199, 0.7) 25%,
+      var(--color-border) 40%,
+      var(--color-border) 60%,
+      rgba(212, 207, 199, 0.8) 75%,
+      var(--color-border) 85%,
+      var(--color-border) 92%,
+      transparent 100%
+    ) 1;
+}
+
+[data-theme="dark"] .brush-border {
+  border-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-border) 8%,
+      var(--color-border) 15%,
+      rgba(58, 58, 80, 0.7) 25%,
+      var(--color-border) 40%,
+      var(--color-border) 60%,
+      rgba(58, 58, 80, 0.8) 75%,
+      var(--color-border) 85%,
+      var(--color-border) 92%,
+      transparent 100%
+    ) 1;
+}
+
+/* --- Brush Border (Top) ---
+   Same tapered effect along the top edge
+   ========================================================================== */
+.brush-border-top {
+  border-top: 2px solid transparent;
+  border-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-border) 8%,
+      var(--color-border) 15%,
+      rgba(212, 207, 199, 0.7) 25%,
+      var(--color-border) 40%,
+      var(--color-border) 60%,
+      rgba(212, 207, 199, 0.8) 75%,
+      var(--color-border) 85%,
+      var(--color-border) 92%,
+      transparent 100%
+    ) 1;
+}
+
+[data-theme="dark"] .brush-border-top {
+  border-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-border) 8%,
+      var(--color-border) 15%,
+      rgba(58, 58, 80, 0.7) 25%,
+      var(--color-border) 40%,
+      var(--color-border) 60%,
+      rgba(58, 58, 80, 0.8) 75%,
+      var(--color-border) 85%,
+      var(--color-border) 92%,
+      transparent 100%
+    ) 1;
+}
+
+/* --- Combined: Paper + Ink ---
+   Use both classes together for the full washi paper experience
+   ========================================================================== */
+.paper-bg.ink-wash {
+  background-image:
+    /* Ink wash layers */
+    radial-gradient(
+      ellipse at 20% 50%,
+      rgba(44, 44, 44, 0.03) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 20%,
+      rgba(44, 44, 44, 0.02) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 50% 80%,
+      rgba(61, 90, 128, 0.02) 0%,
+      transparent 45%
+    ),
+    /* Paper fiber layers */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(139, 125, 107, 0.03) 2px,
+      rgba(139, 125, 107, 0.03) 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(139, 125, 107, 0.02) 3px,
+      rgba(139, 125, 107, 0.02) 4px
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 5px,
+      rgba(160, 145, 125, 0.015) 5px,
+      rgba(160, 145, 125, 0.015) 6px
+    );
+}

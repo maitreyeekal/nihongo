@@ -1,0 +1,300 @@
+/* ==========================================================================
+   Nihongo - Flashcard Component
+   3D flip animation for character study
+   ========================================================================== */
+
+/* --- Container ---
+   ========================================================================== */
+.flashcard-container {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* --- Flashcard ---
+   ========================================================================== */
+.flashcard {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+  cursor: pointer;
+}
+
+.flashcard.flipped {
+  transform: rotateY(180deg);
+}
+
+/* --- Card Faces ---
+   ========================================================================== */
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.flashcard-back {
+  transform: rotateY(180deg);
+}
+
+/* --- Front Face Content ---
+   ========================================================================== */
+.flashcard-character {
+  font-family: var(--font-heading);
+  font-size: 5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  line-height: 1;
+  margin-bottom: var(--space-md);
+}
+
+.flashcard-character-md {
+  font-size: 3rem;
+}
+
+.flashcard-character-sm {
+  font-size: 2rem;
+}
+
+.flashcard-prompt {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.flashcard-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-sm);
+  opacity: 0.7;
+}
+
+/* --- Back Face Content ---
+   ========================================================================== */
+.flashcard-reading {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  color: var(--color-accent);
+  margin-bottom: var(--space-sm);
+}
+
+.flashcard-meaning {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+  text-align: center;
+}
+
+.flashcard-romaji {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.flashcard-example {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: var(--space-sm) var(--space-md);
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: var(--border-radius);
+  margin-top: var(--space-sm);
+}
+
+[data-theme="dark"] .flashcard-example {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* --- Card Number / Progress ---
+   ========================================================================== */
+.flashcard-counter {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  text-align: center;
+}
+
+/* --- Flip Indicator ---
+   ========================================================================== */
+.flashcard-flip-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-top: var(--space-md);
+  opacity: 0.6;
+  animation: pulse-hint 2s ease-in-out infinite;
+}
+
+@keyframes pulse-hint {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* --- Controls: Again / Good / Easy ---
+   ========================================================================== */
+.flashcard-controls {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  width: 100%;
+  max-width: 400px;
+}
+
+.flashcard-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md) var(--space-sm);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  font-family: var(--font-body);
+}
+
+.flashcard-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.flashcard-btn:active {
+  transform: translateY(0);
+}
+
+.flashcard-btn-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.flashcard-btn-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* Again button */
+.flashcard-btn-again {
+  border-color: var(--color-accent-secondary);
+  color: var(--color-accent-secondary);
+}
+
+.flashcard-btn-again:hover {
+  background-color: rgba(200, 75, 49, 0.08);
+}
+
+[data-theme="dark"] .flashcard-btn-again:hover {
+  background-color: rgba(224, 122, 95, 0.12);
+}
+
+/* Good button */
+.flashcard-btn-good {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.flashcard-btn-good:hover {
+  background-color: rgba(61, 90, 128, 0.08);
+}
+
+[data-theme="dark"] .flashcard-btn-good:hover {
+  background-color: rgba(107, 142, 174, 0.12);
+}
+
+/* Easy button */
+.flashcard-btn-easy {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.flashcard-btn-easy:hover {
+  background-color: rgba(122, 139, 105, 0.08);
+}
+
+[data-theme="dark"] .flashcard-btn-easy:hover {
+  background-color: rgba(139, 158, 122, 0.12);
+}
+
+/* --- Swipe Indicators ---
+   ========================================================================== */
+.flashcard-swipe-left,
+.flashcard-swipe-right {
+  position: absolute;
+  top: var(--space-md);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+}
+
+.flashcard-swipe-left {
+  left: var(--space-md);
+  background-color: rgba(200, 75, 49, 0.15);
+  color: var(--color-accent-secondary);
+  border: 2px solid var(--color-accent-secondary);
+}
+
+.flashcard-swipe-right {
+  right: var(--space-md);
+  background-color: rgba(122, 139, 105, 0.15);
+  color: var(--color-success);
+  border: 2px solid var(--color-success);
+}
+
+.flashcard.swiping-left .flashcard-swipe-left,
+.flashcard.swiping-right .flashcard-swipe-right {
+  opacity: 1;
+}
+
+/* --- Deck Stack Effect ---
+   ========================================================================== */
+.flashcard-deck {
+  position: relative;
+}
+
+.flashcard-deck::before,
+.flashcard-deck::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  z-index: -1;
+}
+
+.flashcard-deck::before {
+  bottom: -4px;
+  opacity: 0.7;
+}
+
+.flashcard-deck::after {
+  bottom: -8px;
+  left: 8px;
+  right: 8px;
+  opacity: 0.4;
+}
