@@ -380,6 +380,8 @@
       learnIntro.textContent = 'Discover how kanji evolved from ancient pictures. Tap any card to see the full visual story.';
     } else if (levelId >= 5 && levelId <= 7) {
       learnIntro.textContent = 'Tap any kanji to see its visual breakdown, mnemonic, readings, and examples.';
+    } else if (levelId >= 1 && levelId <= 4) {
+      learnIntro.textContent = 'Tap any character to see its visual mnemonic and hear pronunciation.';
     } else {
       learnIntro.textContent = 'Tap any character to see its reading and hear pronunciation.';
     }
@@ -479,11 +481,11 @@
     if (!grid) throw new Error('no grid');
 
     var items = [];
-    if (levelId === 1) items = hiraganaLevel1.map(function(h){return{ch:h.char,rd:h.romaji,mn:''}});
-    else if (levelId === 2) items = hiraganaLevel2.map(function(h){return{ch:h.char,rd:h.romaji,mn:h.type}});
-    else if (levelId === 3) items = katakanaLevel3.map(function(k){return{ch:k.char,rd:k.romaji,mn:''}});
+    if (levelId === 1) items = hiraganaLevel1.map(function(h){return{ch:h.char,rd:h.romaji,mn:'',isKana:true,mnemonic:h.mnemonic||'',visualHint:h.visualHint||'',kanaType:h.type}});
+    else if (levelId === 2) items = hiraganaLevel2.map(function(h){return{ch:h.char,rd:h.romaji,mn:h.type,isKana:true,mnemonic:h.mnemonic||'',visualHint:h.visualHint||'',kanaType:h.type}});
+    else if (levelId === 3) items = katakanaLevel3.map(function(k){return{ch:k.char,rd:k.romaji,mn:'',isKana:true,mnemonic:k.mnemonic||'',visualHint:k.visualHint||'',kanaType:k.type}});
     else if (levelId === 4) {
-      var chars = (katakanaLevel4.characters||[]).map(function(k){return{ch:k.char,rd:k.romaji,mn:''}});
+      var chars = (katakanaLevel4.characters||[]).map(function(k){return{ch:k.char,rd:k.romaji,mn:'',isKana:true,mnemonic:k.mnemonic||'',visualHint:k.visualHint||'',kanaType:k.type}});
       var loans = (katakanaLevel4.loanwords||[]).map(function(l){return{ch:l.japanese,rd:l.reading,mn:l.english}});
       items = chars.concat(loans);
     }
@@ -546,6 +548,26 @@
       try { speak(item.ch); } catch(e) {}
     }
 
+    function showKanaDetail(item) {
+      var panel = document.getElementById('kanji-panel');
+      var typeLabel = item.kanaType || 'basic';
+      var typeColor = typeLabel === 'basic' ? 'var(--color-accent)' :
+                      typeLabel === 'dakuten' ? 'var(--color-accent-secondary)' :
+                      typeLabel === 'handakuten' ? 'var(--color-gold)' : 'var(--color-success)';
+
+      panel.innerHTML =
+        '<button class="kd-close" onclick="document.getElementById(\'kanji-overlay\').classList.remove(\'show\')">&times;</button>' +
+        '<div class="kd-char">' + item.ch + '</div>' +
+        '<button class="kd-speaker" onclick="try{speak(\'' + item.ch.replace(/'/g,"\\'") + '\')}catch(e){}">🔊</button>' +
+        '<div class="kd-meaning" style="font-size:1.3rem;">' + item.rd + '</div>' +
+        '<div style="text-align:center;margin-bottom:14px;"><span style="display:inline-block;font-size:0.7rem;padding:3px 10px;background:' + typeColor + ';color:#fff;border-radius:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">' + typeLabel + '</span></div>' +
+        (item.mnemonic ? '<div class="kd-section" style="border-left-color:var(--color-gold);"><div class="kd-section-title">Visual Mnemonic</div><div class="kd-mnemonic">' + item.mnemonic + '</div></div>' : '') +
+        (item.visualHint ? '<div class="kd-section" style="border-left-color:var(--color-success);"><div class="kd-section-title">Quick Hint</div><div class="kd-components">' + item.visualHint + '</div></div>' : '');
+
+      overlay.classList.add('show');
+      try { speak(item.ch); } catch(e) {}
+    }
+
     items.forEach(function(item) {
       if (item.isOrigin) {
         var card = document.createElement('div');
@@ -602,6 +624,12 @@
           '<div class="ch' + (isSmall?' small':'') + '">' + item.ch + '</div>' +
           '<div class="rd" style="opacity:1;">' + item.mn + '</div>' +
           '<div class="mn" style="opacity:0.6;font-size:0.6rem;">tap for details</div>';
+      } else if (item.isKana && item.mnemonic) {
+        // Kana cells with mnemonics: show romaji + hint, tap opens detail
+        cell.innerHTML =
+          '<div class="ch' + (isSmall?' small':'') + '">' + item.ch + '</div>' +
+          '<div class="rd" style="opacity:1;">' + item.rd + '</div>' +
+          '<div class="mn" style="opacity:0.6;font-size:0.6rem;">tap for mnemonic</div>';
       } else {
         cell.innerHTML =
           '<div class="ch' + (isSmall?' small':'') + '">' + item.ch + '</div>' +
@@ -612,6 +640,8 @@
       cell.addEventListener('click', function() {
         if (item.isKanji) {
           showKanjiDetail(item);
+        } else if (item.isKana && item.mnemonic) {
+          showKanaDetail(item);
         } else {
           cell.classList.toggle('flipped');
           if (cell.classList.contains('flipped')) {
